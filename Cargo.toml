@@ -1,0 +1,28 @@
+[package]
+name = "portal-theme"
+description = "Follow the Linux desktop's light and dark setting in an egui window, through the XDG desktop portal"
+version = "0.1.0"
+edition = "2021"
+authors = ["David M. Anderson"]
+license = "MIT"
+repository = "https://github.com/excelano/portal-theme"
+readme = "README.md"
+keywords = ["egui", "theme", "dark-mode", "xdg-portal", "linux"]
+categories = ["gui", "os::linux-apis"]
+# egui's floor, since the one type this crate takes is egui's `Context`. It
+# rises when egui raises its own.
+rust-version = "1.95"
+
+[dependencies]
+# The widget toolkit's context, which is the one thing this crate touches: it
+# sets the theme preference on it and asks it for a repaint. egui and not
+# eframe, so that a consumer owes nothing to a window framework for this.
+egui = { version = "0.36", default-features = false }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# The portal lives on D-Bus. zbus is pure Rust with no build script, and it is
+# already compiled on this target under `accesskit_unix`, which arrives through
+# `egui-winit`; `blocking-api` is a feature of that same crate and adds nothing
+# to the tree. `default-features` is off so that `async-io` is named rather
+# than taken, which is what `accesskit` already turns on.
+zbus = { version = "5", default-features = false, features = ["async-io", "blocking-api"] }
